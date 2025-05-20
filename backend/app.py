@@ -9,17 +9,16 @@ from dotenv import load_dotenv
 import os
 import shutil
 
-from langchain_community.document_loaders import TextLoader
-from rag_util import split_text, save_to_chroma
-import chromadb
+from rag_util import split_text, save_to_faiss, query_documents, cleanup_vector_db, load_file, load_directory
 
 app = FastAPI()
 load_dotenv()
 
-CHROMA_PATH = "chroma"
+FAISS_PATH = "faiss"
 
-if os.path.exists(CHROMA_PATH):
-    shutil.rmtree(CHROMA_PATH)
+# Remove database if it exists 
+# if os.path.exists(FAISS_PATH):
+#     shutil.rmtree(FAISS_PATH)
 
 
 @app.get("/")
@@ -54,24 +53,17 @@ async def upload_notes(title: str = Form(...), note_type: NoteType = Form(...), 
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(text)   
 
-    loader = TextLoader(f"{filename}.md")
-    docs = loader.load()
+    # Chunk text and save to FAISS
+    docs = load_file(filename)
     chunks = split_text(docs)
-    save_to_chroma(chunks, CHROMA_PATH)
+    save_to_faiss(chunks, FAISS_PATH)
 
     return {"title": title, "note_type": note_type, "extracted_text": text}
-
-    
 
 # Accept question + history, return RAG Answer
 @app.post('/ask')
 def ask(request: Question):
     question = request.question
-
-    pass
-
-# Return list of notes for tagging/viewing 
-@app.get("/notes")
-def get_notes(): 
-    pass
+    answer = query_documents(question, FAISS_PATH)
+    return {"question": question, "answer": answer}
 
