@@ -44,13 +44,7 @@ export default function UploadPage() {
     try {
       const formData = new FormData()
       formData.append("title", title)
-      if (noteType) {
-        formData.append("note_type", noteType)
-      } else {
-        setError("Note type is required")
-        return
-      }
-
+      formData.append("note_type", noteType)
       formData.append("file", file)
 
       const result = await uploadNote(formData)
@@ -58,7 +52,7 @@ export default function UploadPage() {
       if (result.error) {
         setError(result.error)
       } else {
-        setExtractedText(result.extracted_text || null)
+        setExtractedText(result.extracted_text)
       }
     } catch (err) {
       setError("An error occurred while uploading your note")

@@ -51,7 +51,7 @@ export default function AskPage() {
         // Add assistant message to chat history
         const assistantMessage: ChatMessage = {
           role: "assistant",
-          content: result.answer || "",
+          content: result.answer,
           timestamp: new Date(),
         }
 

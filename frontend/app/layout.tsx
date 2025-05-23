@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "NeuroSync",
   description: "Upload and query your notes with AI",
-} 
+}
 
 export default function RootLayout({
   children,
